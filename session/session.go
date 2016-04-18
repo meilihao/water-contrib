@@ -77,11 +77,7 @@ func (sess *Session) init() {
 			sess.manager.OnSessionNew(sess)
 		}
 	} else {
-		sess.Container = sess.manager.Store.Get(sess.Id)
-		// session is timeout
-		if sess.Container == nil {
-			sess.Container = newContainer()
-		}
+		sess.Container = sess.Get(sess.Id)
 	}
 }
 
@@ -98,6 +94,7 @@ func Get(ctx *water.Context) *Session {
 
 func (sess *Session) Get(id string) *Container {
 	c := sess.manager.Store.Get(id)
+	// session is timeout
 	if c == nil {
 		c = newContainer()
 	}

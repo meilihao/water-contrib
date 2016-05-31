@@ -13,7 +13,7 @@ import (
 	"github.com/cxr29/log"
 	"github.com/facebookgo/symwalk"
 	"github.com/fsnotify/fsnotify"
-	"github.com/meilihao/cutil"
+	"github.com/meilihao/goutil"
 	"github.com/meilihao/water"
 )
 
@@ -129,7 +129,7 @@ func parseTpl(tplCfg *TplConfig) error {
 			return err
 		}
 
-		if !cutil.InSlice(filepath.Ext(fPath), tplCfg.Ext) {
+		if !goutil.InSlice(filepath.Ext(fPath), tplCfg.Ext) {
 			return nil
 		}
 
@@ -240,7 +240,7 @@ func getTemplateTag(fPath string, deep int, tplCfg *TplConfig) error {
 	for _, raw := range reTemplateTag.FindAllString(content, -1) {
 		parsed := reTemplateTag.FindStringSubmatch(raw)
 		tagPath := parsed[1]
-		if !cutil.InSlice(filepath.Ext(tagPath), tplCfg.Ext) {
+		if !goutil.InSlice(filepath.Ext(tagPath), tplCfg.Ext) {
 			continue
 		}
 

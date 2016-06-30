@@ -2,11 +2,15 @@
 
 Middleware csrf generates and validates CSRF tokens for [water](https://github.com/meilihao/water).
 
-### Installation
+## Installation
 
 	go get github.com/meilihao/water-contrib/csrf
 
-**it depends on [water-contrib/session](github.com/meilihao/water-contrib/session)**
+### Warning
+
+1. **it depends on [water-contrib/session](github.com/meilihao/water-contrib/session)**
+1. Using "Form",csrf doesn't support ReGenerateToken,`water.Context.Environ.Set` will panic,but "Header" can.
+
 	
 ## Getting Help
 

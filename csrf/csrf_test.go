@@ -69,12 +69,10 @@ func init() {
 
 // recommend
 func Test_GenerateHeader(t *testing.T) {
-	Init(`{
+	Init(NewCsrf(`{
 		"From":"Header",
-		"Name":"CrsfToken",
-		"Prefix":"crsf_",
-		"MaxAge":3600
-		}`, errFunc, store, NewDefaultTokenGenerator())
+		"Name":"CrsfToken"
+		}`, errFunc, store, NewDefaultTokenGenerator()))
 	Convey("Generate token to header", t, func() {
 		w := water.NewRouter()
 		w.Before(session.New(sessionManager))
@@ -106,12 +104,10 @@ func Test_GenerateHeader(t *testing.T) {
 }
 
 func Test_GenerateForm(t *testing.T) {
-	Init(`{
+	Init(NewCsrf(`{
 		"From":"Form",
-		"Name":"CrsfToken",
-		"Prefix":"crsf_",
-		"MaxAge":3600
-		}`, errFunc, store, NewDefaultTokenGenerator())
+		"Name":"CrsfToken"
+		}`, errFunc, store, NewDefaultTokenGenerator()))
 	Convey("Generate token", t, func() {
 		w := water.NewRouter()
 		w.Before(session.New(sessionManager))
@@ -141,12 +137,10 @@ func Test_GenerateForm(t *testing.T) {
 }
 
 func Test_ValidateHeader(t *testing.T) {
-	Init(`{
+	Init(NewCsrf(`{
 		"From":"Header",
-		"Name":"CrsfToken",
-		"Prefix":"crsf_",
-		"MaxAge":"3600"
-		}`, errFunc, store, NewDefaultTokenGenerator())
+		"Name":"CrsfToken"
+		}`, errFunc, store, NewDefaultTokenGenerator()))
 	Convey("Validate using right token from Header", t, func() {
 		w := water.NewRouter()
 		w.Before(session.New(sessionManager))
@@ -208,12 +202,10 @@ func Test_ValidateHeader(t *testing.T) {
 }
 
 func Test_ValidateForm(t *testing.T) {
-	Init(`{
+	Init(NewCsrf(`{
 		"From":"Form",
-		"Name":"CrsfToken",
-		"Prefix":"crsf_",
-		"MaxAge":3600
-		}`, errFunc, store, NewDefaultTokenGenerator())
+		"Name":"CrsfToken"
+		}`, errFunc, store, NewDefaultTokenGenerator()))
 	Convey("Validate using right token from Form", t, func() {
 		w := water.NewRouter()
 		w.Before(session.New(sessionManager))
@@ -276,12 +268,10 @@ func Test_ValidateForm(t *testing.T) {
 }
 
 func Test_ValidateTimeout(t *testing.T) {
-	Init(`{
+	Init(NewCsrf(`{
 		"From":"Header",
-		"Name":"CrsfToken",
-		"Prefix":"crsf_",
-		"MaxAge":3
-		}`, errFunc, store, NewDefaultTokenGenerator())
+		"Name":"CrsfToken"
+		}`, errFunc, store, NewDefaultTokenGenerator()))
 	Convey("Validate using right token but timeout", t, func() {
 		w := water.NewRouter()
 		w.Before(session.New(sessionManager))

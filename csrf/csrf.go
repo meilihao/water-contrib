@@ -30,6 +30,10 @@ type csrfer interface {
 	Error(*water.Context)
 }
 
+func Init(c csrfer) {
+	_csrfer = c
+}
+
 func GenerateToken(ctx *water.Context) {
 	_csrfer.GenerateToken(ctx)
 }
@@ -105,11 +109,7 @@ func (c *csrf) Error(ctx *water.Context) {
 	c.ErrorFunc(ctx)
 }
 
-func Init(config string, errorFunc func(*water.Context), store Store, tg TokenGenerator) {
-	_csrfer = newCsrf(config, errorFunc, store, tg)
-}
-
-func newCsrf(config string, errorFunc func(*water.Context), store Store, tg TokenGenerator) csrfer {
+func NewCsrf(config string, errorFunc func(*water.Context), store Store, tg TokenGenerator) csrfer {
 	if errorFunc == nil || store == nil || tg == nil {
 		log.Fatalln("csrf : wrong ErrorFunc,Store or TokenGenerator")
 	}

@@ -31,7 +31,18 @@ import (
 func Test_RedisCacher(t *testing.T) {
 	Convey("Test ssdb cache adapter", t, func() {
 		Adapter := "ssdb"
-		AdapterConfig := `{"Prefix":"cssdb_"}`
+		AdapterConfig := `
+{
+    "SSDB":{
+        "Host":"127.0.0.1",
+        "Port":8888,
+        "MinPoolSize":5,
+        "MaxPoolSize":50,
+        "AcquireIncrement":5
+    },
+    "Prefix":"cssdb",
+    "MaxAge":0
+}`
 
 		Convey("Basic operations", func() {
 			router := water.Classic()

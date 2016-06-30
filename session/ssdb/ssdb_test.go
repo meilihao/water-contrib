@@ -31,7 +31,18 @@ func init() {
 	manager.OnSessionRelease = func(s *session.Session) {
 		fmt.Println("OnSessionRelease")
 	}
-	store, err := New("{}")
+	store, err := New(`
+{
+    "SSDB":{
+        "Host":"127.0.0.1",
+        "Port":8888,
+        "MinPoolSize":5,
+        "MaxPoolSize":50,
+        "AcquireIncrement":5
+    },
+    "Prefix":"sssdb_",
+    "MaxAge":0
+}`)
 	if err != nil {
 		log.Fatalln(err)
 	}

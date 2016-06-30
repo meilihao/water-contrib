@@ -149,11 +149,11 @@ func (c *SsdbCache) StartAndGC(config string) error {
 	}
 
 	pool, err := gossdb.NewPool(&gossdb.Config{
-		Host:             js.Get("Host").MustString("127.0.0.1"),
-		Port:             js.Get("Port").MustInt(8888),
-		MinPoolSize:      js.Get("MinPoolSize").MustInt(5),
-		MaxPoolSize:      js.Get("MaxPoolSize").MustInt(50),
-		AcquireIncrement: js.Get("AcquireIncrement").MustInt(5),
+		Host:             js.Get("SSDB").Get("Host").MustString(""),
+		Port:             js.Get("SSDB").Get("Port").MustInt(0),
+		MinPoolSize:      js.Get("SSDB").Get("MinPoolSize").MustInt(0),
+		MaxPoolSize:      js.Get("SSDB").Get("MaxPoolSize").MustInt(0),
+		AcquireIncrement: js.Get("SSDB").Get("AcquireIncrement").MustInt(0),
 	})
 	if err != nil {
 		return err

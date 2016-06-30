@@ -40,8 +40,7 @@ func Test_RedisCacher(t *testing.T) {
         "MaxPoolSize":50,
         "AcquireIncrement":5
     },
-    "Prefix":"cssdb",
-    "MaxAge":0
+    "Prefix":"cssdb"
 }`
 
 		Convey("Basic operations", func() {

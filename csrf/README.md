@@ -1,6 +1,6 @@
 # csrf 
 
-Middleware csrf generates and validates CSRF tokens for [water](https://github.com/meilihao/water).
+Middleware csrf generates and validates CSRF tokens for [water](https://github.com/meilihao/water).it needs backend storage(ssdb).
 
 ## Installation
 

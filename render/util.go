@@ -1,19 +1,24 @@
 package render
 
 import (
+	"bytes"
 	"errors"
 	"io/ioutil"
 )
 
-func getFileContent(fPath string) (string, error) {
-	data, err := ioutil.ReadFile(fPath)
+var (
+	ErrEmptyTmpl = errors.New("EmptyTemplate")
+)
+
+func getFileContent(fp string) (string, error) {
+	data, err := ioutil.ReadFile(fp)
 	if err != nil {
 		return "", err
 	}
 
-	s := string(data)
+	s := string(bytes.TrimSpace(data))
 	if len(s) < 1 {
-		return "", errors.New("EmptyTemplate")
+		return "", ErrEmptyTmpl
 	}
 
 	return s, nil

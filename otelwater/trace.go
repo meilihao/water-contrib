@@ -126,5 +126,5 @@ func HTML(c *water.Context, code int, name string, tmpl *template.Template, obj 
 
 	buf := bytes.NewBuffer(nil)
 	tmpl.Execute(buf, obj)
-	c.HTML(code, buf.String())
+	c.HTMLRaw(code, buf.String())
 }

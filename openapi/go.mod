@@ -1,6 +1,6 @@
 module github.com/meilihao/water-contrib/openapi
 
-go 1.16
+go 1.17
 
 require (
 	github.com/go-playground/validator/v10 v10.6.0 // indirect

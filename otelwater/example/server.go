@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"html/template"
 	"log"
 	"net/http"
@@ -24,7 +25,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/stdout"
+	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	oteltrace "go.opentelemetry.io/otel/trace"
@@ -33,13 +34,18 @@ import (
 var tracer = otel.Tracer("water-server")
 
 func main() {
-	initTracer()
+	tp := initTracer()
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
 	r := water.NewRouter()
 	r.Use(otelwater.Middleware("my-server"))
 	tmplName := "user"
 	tmplStr := "user {{ .name }} (id {{ .id }})\n"
 	tmpl := template.Must(template.New(tmplName).Parse(tmplStr))
-	r.GET("/users/<id>", func(c *water.Context) {
+	r.GET("/users/:id", func(c *water.Context) {
 		id := c.Param("id")
 		name := getUser(c, id)
 		otelwater.HTML(c, http.StatusOK, tmplName, tmpl, water.H{
@@ -50,20 +56,18 @@ func main() {
 	_ = r.Handler().ListenAndServe(":8080")
 }
 
-func initTracer() {
-	exporter, err := stdout.NewExporter(stdout.WithPrettyPrint())
+func initTracer() *sdktrace.TracerProvider {
+	exporter, err := stdout.New(stdout.WithPrettyPrint())
 	if err != nil {
 		log.Fatal(err)
 	}
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
-		sdktrace.WithSyncer(exporter),
+		sdktrace.WithBatcher(exporter),
 	)
-	if err != nil {
-		log.Fatal(err)
-	}
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+	return tp
 }
 
 func getUser(c *water.Context, id string) string {
@@ -72,7 +76,7 @@ func getUser(c *water.Context, id string) string {
 	_, span := tracer.Start(c.Request.Context(), "getUser", oteltrace.WithAttributes(attribute.String("id", id)))
 	defer span.End()
 	if id == "123" {
-		return "otel tester"
+		return "otelwater tester"
 	}
 	return "unknown"
 }

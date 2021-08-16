@@ -30,13 +30,13 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/semconv"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
 const (
 	tracerKey  = "otel-go-contrib-tracer"
-	tracerName = "github.com/meilihao/water-contrib/otel"
+	tracerName = "github.com/meilihao/water-contrib/otelwater"
 )
 
 // Middleware returns middleware that will trace incoming requests.
@@ -45,7 +45,7 @@ const (
 func Middleware(service string, opts ...Option) water.HandlerFunc {
 	cfg := config{}
 	for _, opt := range opts {
-		opt(&cfg)
+		opt.apply(&cfg)
 	}
 	if cfg.TracerProvider == nil {
 		cfg.TracerProvider = otel.GetTracerProvider()
@@ -64,13 +64,13 @@ func Middleware(service string, opts ...Option) water.HandlerFunc {
 			c.Request = c.Request.WithContext(savedCtx)
 		}()
 		ctx := cfg.Propagators.Extract(savedCtx, propagation.HeaderCarrier(c.Request.Header))
-		opts := []oteltrace.SpanOption{
+		opts := []oteltrace.SpanStartOption{
 			oteltrace.WithAttributes(semconv.NetAttributesFromHTTPRequest("tcp", c.Request)...),
 			oteltrace.WithAttributes(semconv.EndUserAttributesFromHTTPRequest(c.Request)...),
-			oteltrace.WithAttributes(semconv.HTTPServerAttributesFromHTTPRequest(service, c.Request.URL.String(), c.Request)...),
+			oteltrace.WithAttributes(semconv.HTTPServerAttributesFromHTTPRequest(service, c.FullPath(), c.Request)...),
 			oteltrace.WithSpanKind(oteltrace.SpanKindServer),
 		}
-		spanName := c.Request.URL.String()
+		spanName := c.FullPath()
 		if spanName == "" {
 			spanName = fmt.Sprintf("HTTP %s route not found", c.Request.Method)
 		}
@@ -97,10 +97,11 @@ func Middleware(service string, opts ...Option) water.HandlerFunc {
 // setting up the span.
 func HTML(c *water.Context, code int, name string, tmpl *template.Template, obj interface{}) {
 	var tracer oteltrace.Tracer
-	tracerInterface := c.Get(tracerKey)
-	if tracerInterface != nil {
-		tracer = tracerInterface.(oteltrace.Tracer)
-	} else {
+	tracerInterface, ok := c.GetMaybe(tracerKey)
+	if ok {
+		tracer, ok = tracerInterface.(oteltrace.Tracer)
+	}
+	if !ok {
 		tracer = otel.GetTracerProvider().Tracer(
 			tracerName,
 			oteltrace.WithInstrumentationVersion(otelcontrib.SemVersion()),
